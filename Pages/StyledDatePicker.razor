@@ -1,0 +1,41 @@
+@page "/styled-datepicker"
+@using Blazorise
+
+<h3>Custom Date Picker with Highlighted Days</h3>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2">
+        <DatePicker TValue="DateTime"
+                    @bind-Date="@selectedDate"
+                    ShowCalendarButton="true"
+                    InputFormat="dd.MM.yyyy"
+                    DisplayFormat="dd.MM.yyyy"
+                    ShowClearButton="true"
+                    Class="pt-md-3"
+                    Placeholder="Select a date" Inline />
+        </div>
+    </div>
+</div>
+
+<p class="mt-3">Selected date <strong>@selectedDate.ToString("dd.MM.yyyy")</strong></p>
+
+@code {
+    private DateTime selectedDate = DateTime.Today;
+
+    private void OnDateClicked(DateTime date)
+    {
+        selectedDate = date;
+    }
+
+    private string GetDateClass(DateTime date)
+    {
+        if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
+            return "bg-warning text-dark"; // Highlight weekends
+
+        if (date == new DateTime(2025, 7, 17))
+            return "bg-danger text-white"; // Special date
+
+        return string.Empty;
+    }
+}

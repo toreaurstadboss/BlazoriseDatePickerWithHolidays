@@ -113,3 +113,26 @@ code {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* Optional: Add more visual flair */
+.bg-warning {
+    background-color: #ffc107 !important;
+}
+
+.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.wide-nav-link {
+    min-width: 200px; /* Adjust as needed */
+    width: 100%;
+    display: inline-block;
+    text-align: left;
+}
+
+.nav-link {
+    min-width: 200px;
+    width: 100%;
+    display: inline-block;
+    text-align: left;
+}
