@@ -14,5 +14,15 @@
             }
         });
     }, 50);
+};
 
+window.registerFlatpickrMonthChange = (selector, dotNetHelper) => {
+    const fpInput = document.querySelector(selector);
+    if (!fpInput || !fpInput._flatpickr) {
+        setTimeout(() => window.registerFlatpickrMonthChange(selector, dotNetHelper), 50);
+        return;
+    }
+    fpInput._flatpickr.config.onMonthChange.push(function () {
+        dotNetHelper.invokeMethodAsync('OnMonthChanged');
+    });
 };
