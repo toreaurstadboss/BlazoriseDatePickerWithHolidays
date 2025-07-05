@@ -136,3 +136,10 @@ code {
     display: inline-block;
     text-align: left;
 }
+
+.flatpickr-day.pink-day {
+    background: #ff69b4 !important; /* Hot pink */
+    
+    color: white !important;
+    border-radius: 50%;
+}

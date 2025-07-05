@@ -1,18 +1,29 @@
 @page "/"
 @using Blazorise
+@inject IJSRuntime JS
 
 <h3>Custom Date Picker with Highlighted Days</h3>
 
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-2">
-        <DatePicker TValue="DateTime"
+        <div class="col-md-3">
+        <Addons>
+        <Addon AddonType="AddonType.Body">
+        <DatePicker TValue="DateTime" 
                     @bind-Date="@selectedDate"
+                    @ref="datePicker"
                     InputFormat="dd.MM.yyyy"
                     DisplayFormat="dd.MM.yyyy"
-                    Class="GetDateClass"
+                    DateClass="GetDateClass"
                     ShowClearButton="true"
-                    Placeholder="Select a date" Inline />
+                    Placeholder="Select a date" />
+        </Addon>
+        <Addon AddonType="AddonType.End">
+            <Button Color="Color.Light" Clicked="@(() => datePicker.ToggleAsync())">
+                <Icon Name="IconName.CalendarDay" />
+            </Button>
+        </Addon>
+        </Addons>
         </div>
     </div>
 </div>
@@ -22,19 +33,32 @@
 @code {
     private DateTime selectedDate = DateTime.Today;
 
+    private DatePicker<DateTime> datePicker;
+
     private void OnDateClicked(DateTime date)
     {
         selectedDate = date;
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender){
+            // Format: "Month Day, Year" (e.g., "July 17, 2025")
+            var datesToHighlight = new[] { "July 17, 2025", "July 18, 2025" };
+            await JS.InvokeVoidAsync("highlightFlatpickrDates", ".flatpickr-calendar", datesToHighlight); 
+        }
+    }
+
     private string GetDateClass(DateTime date)
     {
-        if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
-            return "bg-warning text-dark"; // Highlight weekends
+        return "bg-danger";
 
-        if (date == new DateTime(2025, 7, 17))
-            return "bg-danger text-white"; // Special date
+        // if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
+        //     return "bg-warning text-dark"; // Highlight weekends
 
-        return string.Empty;
+        // if (date == new DateTime(2025, 7, 17))
+        //     return "bg-danger text-white"; // Special date
+
+        // return string.Empty;
     }
 }
