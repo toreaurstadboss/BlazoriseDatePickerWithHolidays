@@ -24,12 +24,12 @@
 
 @code {
     private DateTime selectedDate = new DateTime(2025, 5, 4);
-    private static int minYear = DateTime.Today.AddYears(-10).Year;
+    private static int minYear = DateTime.Today.AddYears(-20).Year;
     private List<AnnotatedDateTime>? _holidays;
 
     protected override void OnInitialized()
     {
-        _holidays = Enumerable.Range(minYear, 20)
+        _holidays = Enumerable.Range(minYear, 40)
             .SelectMany(y => HolidayService.GetHolidays(y))
             .ToList();
     }

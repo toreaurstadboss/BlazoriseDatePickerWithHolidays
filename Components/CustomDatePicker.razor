@@ -35,10 +35,10 @@
     public EventCallback<DateTime> SelectedDateChanged { get; set; }
 
     [Parameter] 
-    public string? InputFormat { get; set; }
+    public string? InputFormat { get; set; } = "dd.MM.yyyy";
 
     [Parameter] 
-    public string? DisplayFormat { get; set; }
+    public string? DisplayFormat { get; set; } = "dd.MM.yyyy";
 
     [Parameter] 
     public string? Placeholder { get; set; }
@@ -55,6 +55,7 @@
         {
             _dotNetRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("registerFlatpickrMonthChange", "input.flatpickr-input", _dotNetRef);
+            await JS.InvokeVoidAsync("registerFlatpickrYearChange", "input.flatpickr-input", _dotNetRef);
         }
         await ReloadDatesToHighlight();
     }
@@ -65,11 +66,17 @@
         await ReloadDatesToHighlight();
     }
 
+    [JSInvokable]
+    public async Task OnYearChanged()
+    {
+        await ReloadDatesToHighlight();
+    }
+
     public async ValueTask DisposeAsync()
     {
-        // _dotNetRef?.Dispose();
-        // if (datePicker != null)
-        //     await datePicker.DisposeAsync();
+        _dotNetRef?.Dispose();
+        if (datePicker != null)
+            await datePicker.DisposeAsync();
     }
     
     private async Task ReloadDatesToHighlight()

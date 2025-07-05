@@ -28,3 +28,14 @@ window.registerFlatpickrMonthChange = (selector, dotNetHelper) => {
         dotNetHelper.invokeMethodAsync('OnMonthChanged');
     });
 };
+
+window.registerFlatpickrYearChange = (selector, dotNetHelper) => {
+    const fpInput = document.querySelector(selector);
+    if (!fpInput || !fpInput._flatpickr) {
+        setTimeout(() => window.registerFlatpickrYearChange(selector, dotNetHelper), 50);
+        return;
+    }
+    fpInput._flatpickr.config.onYearChange.push(function () {
+        dotNetHelper.invokeMethodAsync('OnYearChanged');
+    });
+};
