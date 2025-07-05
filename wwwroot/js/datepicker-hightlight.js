@@ -7,10 +7,12 @@
     //debugger
     setTimeout(() => {
         //
-        dates.forEach(dateStr => {
-            const dayElem = calendar.querySelector(`.flatpickr-day[aria-label="${dateStr}"]`);
+        dates.forEach(date => {
+            //debugger
+            const dayElem = calendar.querySelector(`.flatpickr-day[aria-label="${date.date}"]`);
             if (dayElem) {
                 dayElem.classList.add('pink-day');
+                dayElem.setAttribute('title', date.annotation);
             }
         });
     }, 50);

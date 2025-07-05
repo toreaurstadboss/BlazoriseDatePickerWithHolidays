@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿namespace BlazoriseDatePickerWithHolidays.Service;
 
+public interface IHolidayService
+{
+    DateTime AddWorkingDaysToDate(DateTime date, int days);
+    List<string> GetHolidayNames();
+    IEnumerable<HolidayService.AnnotatedDateTime> GetHolidays(int year);
+    bool IsHoliday(DateTime date);
+    bool IsWorkingDay(DateTime date);
+}
 
-namespace BlazoriseDatePickerWithHolidays.Service;
-
-
-public static class HolidayUtility
+public partial class HolidayService : IHolidayService
 {
 
     private static MemoryCache<int, HashSet<AnnotatedDateTime>> holidays = new();
@@ -44,9 +47,8 @@ public static class HolidayUtility
     /// <param name="date">The original date</param>
     /// <param name="days">The number of working days to add</param>
     /// <returns>The new date</returns>
-    public static DateTime AddWorkingDaysToDate(DateTime date, int days)
+    public DateTime AddWorkingDaysToDate(DateTime date, int days)
     {
-
         var localDate = date;
         for (var i = 0; i < days; i++)
         {
@@ -56,7 +58,6 @@ public static class HolidayUtility
                 localDate = localDate.AddDays(1);
             }
         }
-
         return localDate;
     }
 
@@ -66,13 +67,13 @@ public static class HolidayUtility
     /// </summary>
     /// <param name="date">The date to check</param>
     /// <returns>true if the given date is a working day, false otherwise</returns>
-    public static bool IsWorkingDay(DateTime date)
+    public bool IsWorkingDay(DateTime date)
     {
         return date.DayOfWeek != DayOfWeek.Saturday && date.DayOfWeek != DayOfWeek.Sunday
                && !IsHoliday(date);
     }
 
-    public static List<string> GetHolidayNames()
+    public List<string> GetHolidayNames()
     {
         return holidayNames;
     }
@@ -82,7 +83,7 @@ public static class HolidayUtility
     /// </summary>
     /// <param name="date">date to check if is a holiday</param>
     /// <returns>true if holiday, false otherwise</returns>
-    public static bool IsHoliday(DateTime date)
+    public bool IsHoliday(DateTime date)
     {
         var year = date.Year;
         var holidaysForYear = GetHolidaySet(year);
@@ -101,7 +102,7 @@ public static class HolidayUtility
     /// </summary>
     /// <param name="year">The year to get holidays for</param>
     /// <returns>Holidays, sorted by date</returns>
-    public static IEnumerable<AnnotatedDateTime> GetHolidays(int year)
+    public IEnumerable<AnnotatedDateTime> GetHolidays(int year)
     {
         var days = GetHolidaySet(year);
         var listOfHolidays = new List<AnnotatedDateTime>(days);
@@ -114,7 +115,7 @@ public static class HolidayUtility
     /// </summary>
     /// <param name="year">The year to get holidays for</param>
     /// <returns>Holidays for year</returns>
-    private static IEnumerable<AnnotatedDateTime> GetHolidaySet(int year)
+    private IEnumerable<AnnotatedDateTime> GetHolidaySet(int year)
     {
         if (holidays == null)
         {
@@ -169,7 +170,7 @@ public static class HolidayUtility
     /// </summary>
     /// <param name="year">year</param>
     /// <returns>easterday for year</returns>
-    private static DateTime GetEasterDay(int year)
+    private DateTime GetEasterDay(int year)
     {
         int a = year % 19;
         int b = year / 100;
@@ -189,24 +190,9 @@ public static class HolidayUtility
         return new DateTime(year, n, p + 1);
     }
 
-    private static bool CheckDate(DateTime date, DateTime other)
+    private bool CheckDate(DateTime date, DateTime other)
     {
         return date.Day == other.Day && date.Month == other.Month;
     }
-
-    public class AnnotatedDateTime
-    {
-
-        public AnnotatedDateTime(string annotation, DateTime dateValue)
-        {
-            Annotation = annotation;
-            Value = dateValue;
-        } //constructor AnnotatedDateTime 
-
-        public string Annotation { get; set; }
-
-        public DateTime Value { get; set; }
-
-    } //class AnnotatedDateTime 
 
 }

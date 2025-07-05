@@ -1,12 +1,13 @@
 @page "/"
 @using Blazorise
 @using BlazoriseDatePickerWithHolidays.Service
-@using static BlazoriseDatePickerWithHolidays.Service.HolidayUtility
+@using static BlazoriseDatePickerWithHolidays.Service.HolidayService
 @inject IJSRuntime JS
+@inject IHolidayService HolidayService
 
 <h3>Custom Date Picker with Highlighted Days</h3>
 
-<p>The highlighted dates selected for this demo are Christian Holidays, marked with a pink background, white foreground and rounded corners. Tooltips are added showing the Holiday name</p>
+<p>The highlighted dates selected for this demo are Christian Holidays and other public days off in Norway. In Norwegian, these days off are called 'Offentlige høytidsdager'. These days are marked with a pink background, white foreground and rounded corners. Tooltips are added showing the Holiday name</p>
 
 <div class="container-fluid">
     <div class="row">
@@ -23,7 +24,7 @@
                     Placeholder="Select a date" />
         </Addon>
         <Addon AddonType="AddonType.End">
-            <Button Color="Color.Light" Clicked="@(() => datePicker.ToggleAsync())">
+            <Button Color="Color.Light" Clicked="@(() => datePicker?.ToggleAsync())">
                 <Icon Name="IconName.CalendarDay" />
             </Button>
         </Addon>
@@ -40,9 +41,9 @@
 
     private static int minYear = DateTime.Today.AddYears(-10).Year;
 
-    private static List<AnnotatedDateTime> _holidays = Enumerable.Range(minYear, 20).SelectMany(y => HolidayUtility.GetHolidays(y)).ToList(); // todo - make a service for .NET Wasm app - register into DI container
+    private List<AnnotatedDateTime>? _holidays;
 
-    private DatePicker<DateTime> datePicker;
+    private DatePicker<DateTime>? datePicker;
 
     private void OnDateClicked(DateTime date)
     {
@@ -58,6 +59,12 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         //TODO : Check if firstRender can be only used here instead
+
+        if (firstRender)
+        {
+            _holidays = Enumerable.Range(minYear, 20).SelectMany(y => HolidayService.GetHolidays(y)).ToList();
+            await ReloadDatesToHighlight();
+        }   
     
         if (!firstRender){
              // Register for month change events
@@ -76,14 +83,19 @@
     }
 
     public async ValueTask DisposeAsync(){
-        datePicker?.DisposeAsync();
+        if (datePicker == null){
+            return;
+        }
+        await datePicker!.DisposeAsync();
     }
 
     private async Task ReloadDatesToHighlight(){
-         // Format: "Month Day, Year" (e.g., "July 17, 2025")          
+            // Format: "Month Day, Year" (e.g., "July 17, 2025")     
+            if (_holidays == null){
+                return;
+            }
             var datesToHighlight = _holidays
-                .Select(h => h.Value)
-                .Select(d => d.ToString("MMMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture))
+                .Select(d => new { annotation = d.Annotation, date = d.Value.ToString("MMMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture) })
                 .ToArray();
             await JS.InvokeVoidAsync("highlightFlatpickrDates", ".flatpickr-calendar", datesToHighlight); 
     }
