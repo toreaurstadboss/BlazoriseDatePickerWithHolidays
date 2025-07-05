@@ -1,4 +1,4 @@
-@page "/styled-datepicker"
+@page "/"
 @using Blazorise
 
 <h3>Custom Date Picker with Highlighted Days</h3>
@@ -8,11 +8,10 @@
         <div class="col-md-2">
         <DatePicker TValue="DateTime"
                     @bind-Date="@selectedDate"
-                    ShowCalendarButton="true"
                     InputFormat="dd.MM.yyyy"
                     DisplayFormat="dd.MM.yyyy"
+                    Class="GetDateClass"
                     ShowClearButton="true"
-                    Class="pt-md-3"
                     Placeholder="Select a date" Inline />
         </div>
     </div>
