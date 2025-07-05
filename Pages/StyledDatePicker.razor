@@ -6,6 +6,8 @@
 
 <h3>Custom Date Picker with Highlighted Days</h3>
 
+<p>The highlighted dates selected for this demo are Christian Holidays, marked with a pink background, white foreground and rounded corners. Tooltips are added showing the Holiday name</p>
+
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-3">
@@ -36,7 +38,9 @@
     private DateTime selectedDate = new DateTime(2025, 5, 4);
     private DotNetObjectReference<StyledDatePicker>? _dotNetRef;
 
-    private static List<AnnotatedDateTime> _holidays = HolidayUtility.GetHolidays(2025).ToList(); // todo - make a service for .NET Wasm app - register into DI container
+    private static int minYear = DateTime.Today.AddYears(-10).Year;
+
+    private static List<AnnotatedDateTime> _holidays = Enumerable.Range(minYear, 20).SelectMany(y => HolidayUtility.GetHolidays(y)).ToList(); // todo - make a service for .NET Wasm app - register into DI container
 
     private DatePicker<DateTime> datePicker;
 
@@ -84,16 +88,4 @@
             await JS.InvokeVoidAsync("highlightFlatpickrDates", ".flatpickr-calendar", datesToHighlight); 
     }
 
-    private string GetDateClass(DateTime date)
-    {
-        return "bg-danger";
-
-        // if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday)
-        //     return "bg-warning text-dark"; // Highlight weekends
-
-        // if (date == new DateTime(2025, 7, 17))
-        //     return "bg-danger text-white"; // Special date
-
-        // return string.Empty;
-    }
 }
