@@ -1,34 +1,21 @@
 @page "/"
-@using Blazorise
+@using BlazoriseDatePickerWithHolidays.Components
 @using BlazoriseDatePickerWithHolidays.Service
 @using static BlazoriseDatePickerWithHolidays.Service.HolidayService
-@inject IJSRuntime JS
 @inject IHolidayService HolidayService
 
 <h3>Custom Date Picker with Highlighted Days</h3>
 
-<p>The highlighted dates selected for this demo are Christian Holidays and other public days off in Norway. In Norwegian, these days off are called 'Offentlige høytidsdager'. These days are marked with a pink background, white foreground and rounded corners. Tooltips are added showing the Holiday name</p>
+<p>
+    The highlighted dates selected for this demo are Christian Holidays and other public days off in Norway. In Norwegian, these days off are called 'Offentlige høytidsdager'. These days are marked with a pink background, white foreground and rounded corners. Tooltips are added showing the Holiday name
+</p>
 
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-3">
-        <Addons>
-        <Addon AddonType="AddonType.Body">
-        <DatePicker TValue="DateTime" 
-                    @bind-Date="@selectedDate"
-                    @ref="datePicker"
-                    InputFormat="dd.MM.yyyy"
-                    DisplayFormat="dd.MM.yyyy"
-                    DateClass="GetDateClass"
-                    ShowClearButton="true"
-                    Placeholder="Select a date" />
-        </Addon>
-        <Addon AddonType="AddonType.End">
-            <Button Color="Color.Light" Clicked="@(() => datePicker?.ToggleAsync())">
-                <Icon Name="IconName.CalendarDay" />
-            </Button>
-        </Addon>
-        </Addons>
+            <CustomDatePicker
+                @bind-SelectedDate="selectedDate" 
+                HighlightedDays="_holidays" />
         </div>
     </div>
 </div>
@@ -37,67 +24,13 @@
 
 @code {
     private DateTime selectedDate = new DateTime(2025, 5, 4);
-    private DotNetObjectReference<StyledDatePicker>? _dotNetRef;
-
     private static int minYear = DateTime.Today.AddYears(-10).Year;
-
     private List<AnnotatedDateTime>? _holidays;
 
-    private DatePicker<DateTime>? datePicker;
-
-    private void OnDateClicked(DateTime date)
+    protected override void OnInitialized()
     {
-        selectedDate = date;
+        _holidays = Enumerable.Range(minYear, 20)
+            .SelectMany(y => HolidayService.GetHolidays(y))
+            .ToList();
     }
-
-    private async Task OnDateChanged(DateTime date)
-    {
-        selectedDate = date;
-        await ReloadDatesToHighlight();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        //TODO : Check if firstRender can be only used here instead
-
-        if (firstRender)
-        {
-            _holidays = Enumerable.Range(minYear, 20).SelectMany(y => HolidayService.GetHolidays(y)).ToList();
-            await ReloadDatesToHighlight();
-        }   
-    
-        if (!firstRender){
-             // Register for month change events
-            _dotNetRef = DotNetObjectReference.Create(this);
-
-            await JS.InvokeVoidAsync("registerFlatpickrMonthChange", "input.flatpickr-input", _dotNetRef);
-
-           await ReloadDatesToHighlight();
-        }
-    }
- 
-    [JSInvokable]
-    public async Task OnMonthChanged()
-    {
-        await ReloadDatesToHighlight();
-    }
-
-    public async ValueTask DisposeAsync(){
-        if (datePicker == null){
-            return;
-        }
-        await datePicker!.DisposeAsync();
-    }
-
-    private async Task ReloadDatesToHighlight(){
-            // Format: "Month Day, Year" (e.g., "July 17, 2025")     
-            if (_holidays == null){
-                return;
-            }
-            var datesToHighlight = _holidays
-                .Select(d => new { annotation = d.Annotation, date = d.Value.ToString("MMMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture) })
-                .ToArray();
-            await JS.InvokeVoidAsync("highlightFlatpickrDates", ".flatpickr-calendar", datesToHighlight); 
-    }
-
 }

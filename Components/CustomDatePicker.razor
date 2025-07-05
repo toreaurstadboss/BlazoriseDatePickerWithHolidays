@@ -1,0 +1,103 @@
+@using Blazorise
+@using BlazoriseDatePickerWithHolidays.Service
+@using static BlazoriseDatePickerWithHolidays.Service.HolidayService
+@inject IJSRuntime JS
+
+<Addons>
+    <Addon AddonType="AddonType.Body">
+        <DatePicker TValue="DateTime"
+                    Date="@SelectedDate"
+                    DateChanged="@OnDateChanged"
+                    InputFormat="@InputFormat"
+                    DisplayFormat="@DisplayFormat"
+                    ShowClearButton="@ShowClearButton"
+                    Placeholder="@Placeholder"
+                    @attributes="@AdditionalAttributes"
+                    @ref="datePicker" />
+    </Addon>
+    <Addon AddonType="AddonType.End">
+        <Button Color="Color.Light" Clicked="@(() => datePicker?.ToggleAsync())">
+            <Icon Name="IconName.CalendarDay" />
+        </Button>
+    </Addon>
+</Addons>
+
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public List<AnnotatedDateTime> HighlightedDays { get; set; }
+
+    [Parameter] 
+    public DateTime SelectedDate { get; set; }
+
+    [Parameter] 
+    public EventCallback<DateTime> SelectedDateChanged { get; set; }
+
+    [Parameter] 
+    public string? InputFormat { get; set; }
+
+    [Parameter] 
+    public string? DisplayFormat { get; set; }
+
+    [Parameter] 
+    public string? Placeholder { get; set; }
+
+    [Parameter] 
+    public bool ShowClearButton { get; set; } = true;
+
+    [Parameter(CaptureUnmatchedValues = true)] 
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("registerFlatpickrMonthChange", "input.flatpickr-input", _dotNetRef);
+        }
+        await ReloadDatesToHighlight();
+    }
+
+    [JSInvokable]
+    public async Task OnMonthChanged()
+    {
+        await ReloadDatesToHighlight();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        // _dotNetRef?.Dispose();
+        // if (datePicker != null)
+        //     await datePicker.DisposeAsync();
+    }
+    
+    private async Task ReloadDatesToHighlight()
+    {
+        if (HighlightedDays == null)
+            return;
+
+        var datesToHighlight = HighlightedDays
+            .Select(d => new { annotation = d.Annotation, date = d.Value.ToString("MMMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture) })
+            .ToArray();
+
+        await JS.InvokeVoidAsync("highlightFlatpickrDates", ".flatpickr-calendar", datesToHighlight);
+    }
+
+    private string GetDateClass(DateTime date)
+    {
+        // Optionally, you can use this for additional styling
+        return string.Empty;
+    }
+
+    private async Task OnDateChanged(DateTime newValue)
+    {
+        SelectedDate = newValue;
+        await SelectedDateChanged.InvokeAsync(newValue);
+    }
+
+    private DatePicker<DateTime>? datePicker;
+
+    private DotNetObjectReference<CustomDatePicker>? _dotNetRef;
+
+}
