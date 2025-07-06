@@ -1,16 +1,23 @@
 @using Blazorise
+@using Blazorise.Localization
 @using BlazoriseDatePickerWithHolidays.Service
+@using System.Globalization
 @using static BlazoriseDatePickerWithHolidays.Service.HolidayService
 @inject IJSRuntime JS
+@inject ITextLocalizerService TextLocalizerService
 
 <Addons>
     <Addon AddonType="AddonType.Body">
         <DatePicker TValue="DateTime"
                     Date="@SelectedDate"
+                    FirstDayOfWeek="@FirstDayOfWeek"
                     DateChanged="@OnDateChanged"
-                    InputFormat="@InputFormat"
+                    InputFormat="@InputFormat"                    
+                    WeekNumbers="@WeekNumbers"
                     DisplayFormat="@DisplayFormat"                    
                     ShowClearButton="@ShowClearButton"
+                    ShowTodayButton="true"  
+                    Locale="@Locale"
                     Placeholder="@Placeholder"
                     @attributes="@AdditionalAttributes"
                     @ref="datePicker" />
@@ -36,6 +43,21 @@
     [Parameter]
     public string HighlightCssClass { get; set; } = "pink-day";
 
+    /// <summary>
+    /// The first day of the week in the date picker calendar. Defaults to Monday.
+    /// </summary>
+    [Parameter]
+    public DayOfWeek FirstDayOfWeek { get; set; } = DayOfWeek.Monday;
+
+    /// <summary>   
+    /// The locale to use for the date picker, which affects date formatting and localization. 
+    /// Supported locales : https://blazorise.com/docs/helpers/localization
+    /// </summary>
+    [Parameter]
+    public string Locale { get; set; } = "en-US";
+
+    [Parameter]
+    public bool WeekNumbers { get; set; } = true;
 
     /// <summary>
     /// The currently selected date in the date picker.
@@ -93,6 +115,13 @@
         await ReloadDatesToHighlight();
     }
 
+    protected override void OnParametersSet()
+    {
+        if (Locale != null){
+            TextLocalizerService.ChangeLanguage(Locale);
+        }
+    }
+
     /// <summary>
     /// Invoked from JS when the month is changed in the calendar.
     /// </summary>
@@ -129,9 +158,15 @@
         if (HighlightedDays == null)
             return;
 
+        string chosenLocale = this.Locale ?? "en-US";
+
+        //Console.WriteLine("chosenLocale:" + chosenLocale);
+
         var datesToHighlight = HighlightedDays
-            .Select(d => new { annotation = d.Annotation, date = d.Value.ToString("MMMM d, yyyy", System.Globalization.CultureInfo.InvariantCulture) })
+            .Select(d => new { annotation = d.Annotation, date = d.Value.ToString("MMMM d, yyyy", new CultureInfo(chosenLocale)) })
             .ToArray();
+
+        //Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(datesToHighlight));
 
         await JS.InvokeVoidAsync(
             "highlightFlatpickrDates",
