@@ -143,3 +143,7 @@ code {
     color: white !important;
     border-radius: 50%;
 }
+
+.addon-margin {
+    margin-left: 0.25rem !important; /* Adjust as needed */
+}

@@ -9,14 +9,14 @@
                     Date="@SelectedDate"
                     DateChanged="@OnDateChanged"
                     InputFormat="@InputFormat"
-                    DisplayFormat="@DisplayFormat"
+                    DisplayFormat="@DisplayFormat"                    
                     ShowClearButton="@ShowClearButton"
                     Placeholder="@Placeholder"
                     @attributes="@AdditionalAttributes"
                     @ref="datePicker" />
     </Addon>
     <Addon AddonType="AddonType.End">
-        <Button Color="Color.Light" Clicked="@(() => datePicker?.ToggleAsync())">
+        <Button Class="addon-margin" Color="Color.Primary" Clicked="@(() => datePicker?.ToggleAsync())">
             <Icon Name="IconName.CalendarDay" />
         </Button>
     </Addon>
