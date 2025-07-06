@@ -23,32 +23,58 @@
 </Addons>
 
 @code {
-
+    /// <summary>
+    /// List of dates to be highlighted in the date picker. Each date can have an annotation (e.g., holiday name) that will be shown as a tooltip.
+    /// </summary>
     [Parameter]
     [EditorRequired]
     public List<AnnotatedDateTime> HighlightedDays { get; set; }
 
+    /// <summary>
+    /// The currently selected date in the date picker.
+    /// </summary>
     [Parameter] 
     public DateTime SelectedDate { get; set; }
 
+    /// <summary>
+    /// Event callback triggered when the selected date changes.
+    /// </summary>
     [Parameter] 
     public EventCallback<DateTime> SelectedDateChanged { get; set; }
 
+    /// <summary>
+    /// The input format string for displaying the date in the input field.
+    /// </summary>
     [Parameter] 
     public string? InputFormat { get; set; } = "dd.MM.yyyy";
 
+    /// <summary>
+    /// The display format string for showing the date in the calendar.
+    /// </summary>
     [Parameter] 
     public string? DisplayFormat { get; set; } = "dd.MM.yyyy";
 
+    /// <summary>
+    /// Placeholder text to display when no date is selected.
+    /// </summary>
     [Parameter] 
     public string? Placeholder { get; set; }
 
+    /// <summary>
+    /// Whether to show the clear button in the date picker.
+    /// </summary>
     [Parameter] 
     public bool ShowClearButton { get; set; } = true;
 
+    /// <summary>
+    /// Additional attributes to be splatted onto the underlying DatePicker component.
+    /// </summary>
     [Parameter(CaptureUnmatchedValues = true)] 
     public Dictionary<string, object>? AdditionalAttributes { get; set; }
 
+    /// <summary>
+    /// Handles component rendering and registers JS interop for month and year changes.
+    /// </summary>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -60,18 +86,27 @@
         await ReloadDatesToHighlight();
     }
 
+    /// <summary>
+    /// Invoked from JS when the month is changed in the calendar.
+    /// </summary>
     [JSInvokable]
     public async Task OnMonthChanged()
     {
         await ReloadDatesToHighlight();
     }
 
+    /// <summary>
+    /// Invoked from JS when the year is changed in the calendar.
+    /// </summary>
     [JSInvokable]
     public async Task OnYearChanged()
     {
         await ReloadDatesToHighlight();
     }
 
+    /// <summary>
+    /// Disposes JS interop references and the DatePicker component.
+    /// </summary>
     public async ValueTask DisposeAsync()
     {
         _dotNetRef?.Dispose();
@@ -79,24 +114,32 @@
             await datePicker.DisposeAsync();
     }
     
+    /// <summary>
+    /// Highlights the specified dates in the calendar using JS interop.
+    /// </summary>
     private async Task ReloadDatesToHighlight()
     {
         if (HighlightedDays == null)
             return;
 
         var datesToHighlight = HighlightedDays
-            .Select(d => new { annotation = d.Annotation, date = d.Value.ToString("MMMM dd, yyyy", System.Globalization.CultureInfo.InvariantCulture) })
+            .Select(d => new { annotation = d.Annotation, date = d.Value.ToString("MMMM d, yyyy", System.Globalization.CultureInfo.InvariantCulture) })
             .ToArray();
-
+                
         await JS.InvokeVoidAsync("highlightFlatpickrDates", ".flatpickr-calendar", datesToHighlight);
     }
 
+    /// <summary>
+    /// Optionally provides a CSS class for a given date. Not used in this implementation.
+    /// </summary>
     private string GetDateClass(DateTime date)
     {
-        // Optionally, you can use this for additional styling
         return string.Empty;
     }
 
+    /// <summary>
+    /// Handles the date change event from the DatePicker and propagates it to the parent component.
+    /// </summary>
     private async Task OnDateChanged(DateTime newValue)
     {
         SelectedDate = newValue;
@@ -104,7 +147,5 @@
     }
 
     private DatePicker<DateTime>? datePicker;
-
     private DotNetObjectReference<CustomDatePicker>? _dotNetRef;
-
 }
