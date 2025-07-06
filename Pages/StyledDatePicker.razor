@@ -28,7 +28,13 @@
             <CustomDatePicker
                 @bind-SelectedDate="selectedDate" 
                 Locale="en-US"
-                HighlightedDays="_holidays" @ref="@_datePicker" />
+                FirstDayOfWeek="DayOfWeek.Monday"
+                InputMode="DateInputMode.DateTime"
+                DisplayFormat="HH:mm dd.MM.yyyy"
+                InputFormat="HH:mm dd.MM.yyyy"
+                TimeAs24hr="true"
+                HighlightedDays="_holidays"
+                @ref="@_datePicker" />
         </div>
     </div>
 </div>
@@ -37,7 +43,7 @@
     var chosenLocale = new CultureInfo(_datePicker?.Locale ?? "en-US");
 }
 
-<p class="mt-3">Selected date <strong>@selectedDate.ToString("dd.MM.yyyy", chosenLocale)</strong></p>
+<p class="mt-3">Selected date <strong>@selectedDate.ToString("HH:mm dd.MM.yyyy", chosenLocale)</strong></p>
 
 @code {
     private DateTime selectedDate = new DateTime(2025, 5, 4);

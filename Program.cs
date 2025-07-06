@@ -15,7 +15,7 @@ builder.Services
 .AddSingleton<IHolidayService, HolidayService>()
 .AddBlazorise(options =>
 {
-    options.Immediate = false; // Use immediate mode for Blazorise components
+    options.Immediate = true; // Use immediate mode for Blazorise components
 })
 .AddFontAwesomeIcons()
 .AddBootstrap5Providers()

@@ -12,13 +12,11 @@
                     Date="@SelectedDate"
                     FirstDayOfWeek="@FirstDayOfWeek"
                     DateChanged="@OnDateChanged"
-                    InputFormat="@InputFormat"                    
-                    WeekNumbers="@WeekNumbers"
+                    InputFormat="@InputFormat"   
+                    InputMode="@InputMode"
                     DisplayFormat="@DisplayFormat"                    
-                    ShowClearButton="@ShowClearButton"
-                    ShowTodayButton="true"  
-                    Locale="@Locale"
                     Placeholder="@Placeholder"
+                    TimeAs24hr="@TimeAs24hr"
                     @attributes="@AdditionalAttributes"
                     @ref="datePicker" />
     </Addon>
@@ -41,13 +39,19 @@
     /// The CSS class to apply to highlighted dates in the calendar.
     /// </summary>
     [Parameter]
-    public string HighlightCssClass { get; set; } = "pink-day";
+    public string HighlightCssClass { get; set; } = "pink-day"; //Default CSS class pink-day is a custom CSS class defined in wwwroot/css/app.css
 
     /// <summary>
     /// The first day of the week in the date picker calendar. Defaults to Monday.
     /// </summary>
     [Parameter]
     public DayOfWeek FirstDayOfWeek { get; set; } = DayOfWeek.Monday;
+
+    /// <summary>
+    /// Whether to display time in 24-hour format. Defaults to true.
+    /// </summary>
+    [Parameter]
+    public bool TimeAs24hr { get; set; } = true;
 
     /// <summary>   
     /// The locale to use for the date picker, which affects date formatting and localization. 
@@ -56,8 +60,11 @@
     [Parameter]
     public string Locale { get; set; } = "en-US";
 
+    /// <summary>
+    /// The input mode for the date picker, which can be either Date or DateTime or Month.
+    /// </summary>
     [Parameter]
-    public bool WeekNumbers { get; set; } = true;
+    public DateInputMode InputMode { get; set; } = DateInputMode.Date;
 
     /// <summary>
     /// The currently selected date in the date picker.
