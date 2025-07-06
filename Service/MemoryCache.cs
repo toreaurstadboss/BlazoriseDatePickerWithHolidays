@@ -2,7 +2,7 @@
 
 namespace BlazoriseDatePickerWithHolidays.Service
 {
-    public class MemoryCache<TKey, TValue>
+    public class MemoryCache<TKey, TValue> where TKey : notnull
     {
         private readonly ConcurrentDictionary<TKey, TValue> _cache = new();
 

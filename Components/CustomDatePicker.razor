@@ -2,6 +2,7 @@
 @using Blazorise.Localization
 @using BlazoriseDatePickerWithHolidays.Service
 @using System.Globalization
+@using Blazorise.Icons.FontAwesome
 @using static BlazoriseDatePickerWithHolidays.Service.HolidayService
 @inject IJSRuntime JS
 @inject ITextLocalizerService TextLocalizerService
@@ -22,7 +23,7 @@
     </Addon>
     <Addon AddonType="AddonType.End">
         <Button Class="addon-margin" Color="Color.Primary" Clicked="@(() => datePicker?.ToggleAsync())">
-            <Icon Name="IconName.CalendarDay" />
+            <Blazorise.Icons.FontAwesome.Icon Name="IconName.CalendarDay" />
         </Button>
     </Addon>
 </Addons>

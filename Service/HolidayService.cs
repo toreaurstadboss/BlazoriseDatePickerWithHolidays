@@ -161,7 +161,7 @@ public partial class HolidayService : IHolidayService
 
             holidays.Add(year, yearSet);
         }
-        return holidays.GetAsValue(year);
+        return holidays.GetAsValue(year)!;
     }
 
     /// <summary>
