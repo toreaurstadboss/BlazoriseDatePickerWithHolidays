@@ -1,4 +1,4 @@
-﻿window.highlightFlatpickrDates = (selector, dates) => {
+﻿window.highlightFlatpickrDates = (selector, dates, highlightCssClass) => {
     //debugger
     const calendar = document.querySelector(selector); 
     if (!calendar) {
@@ -11,7 +11,7 @@
             //debugger
             const dayElem = calendar.querySelector(`.flatpickr-day[aria-label="${date.date}"]`);
             if (dayElem) {
-                dayElem.classList.add('pink-day');
+                dayElem.classList.add(highlightCssClass);
                 dayElem.setAttribute('title', date.annotation);
             }
         });

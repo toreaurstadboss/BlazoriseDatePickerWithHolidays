@@ -138,8 +138,7 @@ code {
 }
 
 .flatpickr-day.pink-day {
-    background: #ff69b4 !important; /* Hot pink */
-    
+    background: #ff69b4 !important; /* Hot pink */   
     color: white !important;
     border-radius: 50%;
 }

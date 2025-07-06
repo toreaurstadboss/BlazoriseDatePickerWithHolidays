@@ -31,6 +31,13 @@
     public List<AnnotatedDateTime> HighlightedDays { get; set; }
 
     /// <summary>
+    /// The CSS class to apply to highlighted dates in the calendar.
+    /// </summary>
+    [Parameter]
+    public string HighlightCssClass { get; set; } = "pink-day";
+
+
+    /// <summary>
     /// The currently selected date in the date picker.
     /// </summary>
     [Parameter] 
@@ -125,8 +132,13 @@
         var datesToHighlight = HighlightedDays
             .Select(d => new { annotation = d.Annotation, date = d.Value.ToString("MMMM d, yyyy", System.Globalization.CultureInfo.InvariantCulture) })
             .ToArray();
-                
-        await JS.InvokeVoidAsync("highlightFlatpickrDates", ".flatpickr-calendar", datesToHighlight);
+
+        await JS.InvokeVoidAsync(
+            "highlightFlatpickrDates",
+            ".flatpickr-calendar",
+            datesToHighlight,
+            HighlightCssClass // Pass the class as an extra argument
+        );
     }
 
     /// <summary>
